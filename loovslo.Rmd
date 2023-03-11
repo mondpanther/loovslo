@@ -1,6 +1,6 @@
 ---
 title:  LOO, LO & LOX
-subtitle: Monte Carlo Simulations on Leave one Out, Leave (more than one) Out and Leave Out with Control (LOX) estimators
+subtitle: Monte Carlo Simulations of Leave one Out, Leave (more than one) Out and Leave Out with Extra Control (LOX) estimators
 output: 
   html_document:
     css: style.css
@@ -34,9 +34,9 @@ This provides background to the empirical strategy used in [De Haas et al](https
 
 
 
-We illustrate 2 strategies to address these criticisms (both used in DeHaas et al) and provide Monte-Carlo evidence on their effectiveness.
+We illustrate two strategies to address these criticisms (both used in HMMS) and provide Monte-Carlo evidence on their effectiveness.
 
-- The first strategy was identified by [Sundquist](https://jamessundquist.github.io/website/docs/How_to_Use_Spatial_Instruments.pdf) who shows that LOO instruments can conherently be applied when they are used as proxies for an underlying exogenous variable $z$ that affects both unit $i$ and its neighbors $j$.
+- The first strategy was identified by [Sundquist](https://jamessundquist.github.io/website/docs/How_to_Use_Spatial_Instruments.pdf) who shows that LOO instruments can coherently be applied when they are used as proxies for an underlying exogenous variable $z$ that affects both unit $i$ and its neighbors $j$.
 
 - The second strategy rests on assumptions by the direction of causality based on observable characteristics. In the HMMS the assumption is that information about management practices typically flows from much larger to smaller firms but not other way round. To address issue 3 identified above then requires instruments that leave "more than one out". For simplicity we call these simply "leave out" as opposed to "leave one out". Moreover, to deal with the requirement of exclusivity (or rather conditional exclusivity), we suggest to include outcomes of neighboring (larger) units as further control. We dub this the LOX approach (leave out with controls x).
 
@@ -90,9 +90,9 @@ Below we see that while OLS, LOO and LO are heavily biased (indeed LOO and LO ar
 ```{r, include=FALSE}
 
 
-        firms=400
-        sigeps=.1
-        signu=.1
+        firms=200
+        #sigeps=.1
+        signu=.01
         sigxi=.1
         
         n_g=100   # geographic groups...
@@ -102,8 +102,8 @@ Below we see that while OLS, LOO and LO are heavily biased (indeed LOO and LO ar
         phiz=.3
         phiybar=.3
         
-        sigepschi=.1
-        sigepsx=.1
+        sigepschi=.01
+        sigepsx=.01
         betax=.5
         betachi=.5
        
@@ -162,7 +162,7 @@ gamble=function(input){
        keys   <- c("firms", 
                    "n_g",
                    "repli",
-                   "sigeps",
+                   #"sigeps",
                    "signu",
                    "sigxi",
                    "phichibar",
@@ -272,7 +272,7 @@ renderText({
 
 Blue lines indicate true parameter values. Output might take a couple of seconds to appear....
 
-## OLS
+### OLS
 
 
 ```{r}
@@ -281,14 +281,14 @@ Blue lines indicate true parameter values. Output might take a couple of seconds
 ```
 
 
-## LOO
+### LOO: Leave One Out
 
 ```{r}
 plotOutput("LOO")
 
 ```
 
-## LO
+### LO: Leave more than one Out
 
 ```{r}
 plotOutput("LO")
@@ -296,9 +296,14 @@ plotOutput("LO")
 ```
 
 
-## LOX
+### LOX: Leave more than one Out with eXtra controls
 
 ```{r}
 plotOutput("LOX")
 #renderPlot(grid.arrange(p_betax_LOX,p_betachi_LOX, nrow = 1))
 ```
+
+
+# References:
+
+- The code for this is available under [https://github.com/mondpanther/loovslo](https://github.com/mondpanther/loovslo)
