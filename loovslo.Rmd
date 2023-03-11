@@ -74,7 +74,7 @@ where
 $$
 \epsilon_i=\phi_{\bar{y}} \bar{y}_{l>l(i)}+\xi_i+\nu_i 
 $$
-Consequently, both $x$ and $\chi$ are endogenous due to the presence of $\nu$. $x_i$ is driven in part by an un-observed exogenous shifter $z_g$ that is shared between units that are sufficiently close. $\chi_i$ on the other hand is in part driven by values of $\chi$ in units that are larger in terms of $l$. In addition $\epsilon_i$ is also driven by the outcomes $Y$ in units larger in terms of $l$; e.g. in HMMS it could be clean management in neighboring larger firms that leads smaller firms to adopt clean management practices as well. Alternatively, smaller firms might respond to the effects of clean management practices in larger firms such as the installation of solar panels for instance.
+Consequently, both $x$ and $\chi$ are endogenous due to the presence of $\nu$. $x_i$ is driven in part by an un-observed exogenous shifter $z_g$ that is shared between units that are sufficiently close. $\chi_i$ on the other hand is in part driven by values of $\chi$ in units that are larger in terms of $l$. In addition $\epsilon_i$ is also driven by the outcomes $y$ in units larger in terms of $l$; e.g. in HMMS it could be clean management in neighboring larger firms that leads smaller firms to adopt clean management practices as well. Alternatively, smaller firms might respond to the effects of clean management practices in larger firms such as the installation of solar panels for instance.
 
 We can consequently identify  consistent estimates for $\beta_x$ and $\beta_{\chi}$ by estimating the regression model
 
@@ -272,7 +272,7 @@ renderText({
 
 Blue lines indicate true parameter values. Output might take a couple of seconds to appear....
 
-# OLS
+## OLS
 
 
 ```{r}
@@ -281,14 +281,14 @@ Blue lines indicate true parameter values. Output might take a couple of seconds
 ```
 
 
-# LOO
+## LOO
 
 ```{r}
 plotOutput("LOO")
 
 ```
 
-# LO
+## LO
 
 ```{r}
 plotOutput("LO")
@@ -296,7 +296,7 @@ plotOutput("LO")
 ```
 
 
-# LOX
+## LOX
 
 ```{r}
 plotOutput("LOX")
