@@ -1,5 +1,5 @@
 # routines to maintain the loovslo roulette
-
+library(compiler)
 
 
 # Draw dataset ####
@@ -128,6 +128,9 @@ esti=function(rlabel,df){
   
 }
 
+
+drawdata=cmpfun(drawdata)
+esti=cmpfun(esti)
 
 
 # Run montecarlo ####
