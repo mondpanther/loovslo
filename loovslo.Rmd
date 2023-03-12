@@ -18,6 +18,9 @@ library(shinycssloaders)
 library(dplyr)
 library(waiter)
 library(shinybusy)
+library(shiny.worker)
+
+#worker <- initialize_worker()
 
 
 ```
@@ -194,13 +197,40 @@ gamble=function(input){
        return(res)
   }
 
+##################################
 
+
+#######################
 
 renderText({
   
   #print("now")
   
-  rr_df=gamble(input)
+  #rr_df=gamble(input)
+  
+  ##############################################################
+  
+  
+ # plotValuesPromise <- worker$run_job("plotValuesPromise", function(args) {
+#    gamble(input)
+#  },
+#  args_reactive = reactive({
+#    input$triggerButton
+#    print("triggered!")
+#    ""
+#  }))
+  
+ # rr_df=plotValuesPromise()
+  
+  
+  ##############################################################
+  
+ 
+
+  
+  
+  ##############
+  
   
   library(latex2exp)
   library(gridExtra)
