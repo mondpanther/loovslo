@@ -153,7 +153,8 @@ monte=function(params){
   
   cores=detectCores()
   #cl <- makeCluster(cores[1]-2) #not to overload your computer
-  cl <- makeCluster(as.integer(cores/2)) #not to overload your computer
+  #cl <- makeCluster(as.integer(cores/3)) #not to overload your computer
+  cl <- makeCluster(as.integer(1)) #not to overload your computer
   
   combiner=function(final,temp){
     library(dplyr)
@@ -190,3 +191,4 @@ monte=function(params){
   
 }
 
+#monte=cmpfun(monte)

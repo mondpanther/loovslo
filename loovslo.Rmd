@@ -43,7 +43,8 @@ We illustrate two strategies to address these criticisms (both used in DMMS) and
 
 - The first strategy was identified by [Sundquist](https://jamessundquist.github.io/website/docs/How_to_Use_Spatial_Instruments.pdf) who shows that LOO instruments can coherently be applied when they are used as proxies for an underlying exogenous variable $z$ that affects both unit $i$ and its neighbors $j$.
 
-- The second strategy rests on assumptions by the direction of causality based on observable characteristics. In the DMMS the assumption is that information about management practices typically flows from much larger to smaller firms but not other way round. To address issue 3 identified above then requires instruments that leave "more than one out". For simplicity we call these simply "leave out" as opposed to "leave one out". Moreover, to deal with the requirement of exclusivity (or rather conditional exclusivity), we suggest to include outcomes of neighboring (larger) units as further control. We dub this the LOX approach (leave out with controls x).
+- The second strategy rests on assumptions by the direction of causality based on observable characteristics. In the DMMS the assumption is that information about management practices typically flows from much larger to smaller firms but not other way round. To address issue 3 identified above then requires instruments that we leave "more than one out". Specifically we need to leave out units $j$ that are smaller than a given unit $i$.
+For simplicity we call these simply "leave out" as opposed to "leave one out". Moreover, to deal with the requirement of exclusivity (or rather conditional exclusivity), we suggest to include outcomes of neighboring (larger) units as further control. We dub this the LOX approach (leave out with eXtra controls).
 
 
 
@@ -206,7 +207,7 @@ renderText({
   
   #print("now")
   
-  #rr_df=gamble(input)
+  rr_df=gamble(input)
   
   ##############################################################
   
@@ -302,6 +303,7 @@ renderText({
 
   print("................................................................................")# %>% withSpinner()
   #summary(rr_df)
+  #textOutput("t1")%>% withSpinner(color="#0dc5c1")
 
 })
 
@@ -315,8 +317,7 @@ Blue lines indicate true parameter values. Output might take a couple of seconds
 
 
 ```{r}
-
- plotOutput("ols")
+plotOutput("ols")
 
 ```
 
