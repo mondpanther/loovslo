@@ -5,9 +5,9 @@ account: mondpanther
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 8537465
-bundleId: 6955399
+bundleId: 6955408
 url: https://mondpanther.shinyapps.io/loovslo/
-when: 1678780208.59995
-lastSyncTime: 1678780208.59997
+when: 1678780289.73929
+lastSyncTime: 1678780289.73931
 asMultiple: FALSE
 asStatic: FALSE
