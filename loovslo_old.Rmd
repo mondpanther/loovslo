@@ -1,0 +1,350 @@
+---
+title:  LOO, LO & LOX
+subtitle: Monte Carlo Simulations of Leave One Out, Leave more than one Out and Leave Out with eXtra control estimators
+output: 
+  html_document:
+    css: style.css
+runtime: shiny
+---
+
+
+
+
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE,warning=FALSE)
+library(shinycssloaders)
+library(dplyr)
+library(waiter)
+library(shinybusy)
+library(shiny.worker)
+
+#worker <- initialize_worker()
+
+
+```
+
+
+# Context
+This provides background to the empirical strategy used in [De Haas, Martin Muuls & Schweiger](https://cep.lse.ac.uk/_NEW/PUBLICATIONS/abstract.asp?index=9149) (DMMS). The paper examines the impact of credit constraints and management quality on investments in environmental technology and environmental performance of firms. It relies in part on Leave Out Instruments. Such Instruments have recently been critized e.g. by [Betz et al](https://www.cambridge.org/core/journals/political-analysis/article/on-the-use-and-abuse-of-spatial-instruments/8F45B5AC444FF4B61E8AA04CFDC05E8A) or [McKenzie](https://blogs.worldbank.org/impactevaluations/im-not-fan-leave-one-outspatial-instruments). The suggested issues are as follows
+
+1. We require an exclusion restriction: for an endogeneous variable $x_i$ must be driven by the same variable in another unit $x_j$ but not in reverse.
+
+2. $x_j$ must affect unit $i$ only through $x_i$ (exclusivity)
+
+3. [Betz et al](https://www.cambridge.org/core/journals/political-analysis/article/on-the-use-and-abuse-of-spatial-instruments/8F45B5AC444FF4B61E8AA04CFDC05E8A) suggest that LOO insruments also face an inherent "simultaneity bias". 
+
+
+
+
+
+We illustrate two strategies to address these criticisms (both used in DMMS) and provide Monte-Carlo evidence on their effectiveness.
+
+- The first strategy was identified by [Sundquist](https://jamessundquist.github.io/website/docs/How_to_Use_Spatial_Instruments.pdf) who shows that LOO instruments can coherently be applied when they are used as proxies for an underlying exogenous variable $z$ that affects both unit $i$ and its neighbors $j$.
+
+- The second strategy rests on assumptions by the direction of causality based on observable characteristics. In the DMMS the assumption is that information about management practices typically flows from much larger to smaller firms but not other way round. To address issue 3 identified above then requires instruments that we leave "more than one out". Specifically we need to leave out units $j$ that are smaller than a given unit $i$.
+For simplicity we call these simply "leave out" as opposed to "leave one out". Moreover, to deal with the requirement of exclusivity (or rather conditional exclusivity), we suggest to include outcomes of neighboring (larger) units as further control. We dub this the LOX approach (leave out with eXtra controls).
+
+
+
+# Setup
+
+The setup is as follows: 
+Suppose we have cross sectional data comprising of units $i$ with (at least) 2 features: 
+
+- a characteristic $g$ on which we can define a closeness measure (e.g. geographical space)
+- some ordinal measure that is informative of knowledge flows between units (e.g. firm size for units that are firms) $l$
+
+
+We have a model
+$$
+y_i=\beta_x x_i +\beta_{\chi} \chi_{i} +\epsilon_i
+$$
+where drivers $x$ and $\chi$ of an outcome variable $y$ are endogenous. For the purpose of the Monte-Carlo Exercise below we assume
+
+$$
+x_i=\epsilon_x+\phi_z z_{g(i)}+\nu_i
+$$  
+
+and 
+
+$$
+\chi_i=\epsilon_\chi+\phi_{\bar{\chi}} \bar{\chi}_{l>l(i)}+\nu_i
+$$
+
+
+
+where 
+
+$$
+\epsilon_i=\phi_{\bar{y}} \bar{y}_{l>l(i)}+\xi_i+\nu_i 
+$$
+Consequently, both $x$ and $\chi$ are endogenous due to the presence of $\nu$. $x_i$ is driven in part by an un-observed exogenous shifter $z_g$ that is shared between units that are sufficiently close. $\chi_i$ on the other hand is in part driven by values of $\chi$ in units that are larger in terms of $l$. In addition $\epsilon_i$ is also driven by the outcomes $y$ in units larger in terms of $l$; e.g. in DMMS it could be clean management in neighboring larger firms that leads smaller firms to adopt clean management practices as well. Alternatively, smaller firms might respond to the effects of clean management practices in larger firms such as the installation of solar panels for instance.
+
+We can consequently identify  consistent estimates for $\beta_x$ and $\beta_{\chi}$ by estimating the regression model
+
+$$
+y_i=\beta_x x_i +\beta_{\chi} \chi_{i}+\phi_{\bar{y}} \bar{y}_{l>l(i)} +\xi_i+\nu_i 
+$$
+
+using $\bar{\chi}_{l>l(i)}$ and $\bar{x}_{j\neq i}$ as instruments for $\chi_i$ and $x_i$; i.e. $\bar{\chi}_{l>l(i)}$ is average value of $\chi$ in neighboring units larger (in terms of $l$) than $i$ whereas $\bar{x}_{j\neq i}$ is the average value of $x$ across all neighboring units excluding $i$ itself (i.e. the usual LOO approach).
+
+
+Below we see that while OLS, LOO and LO are heavily biased (indeed LOO and LO are more biased than OLS), LOX is not.
+
+```{r, include=FALSE}
+
+
+        firms=200
+        #sigeps=.1
+        signu=.01
+        sigxi=.1
+        
+        n_g=50   # geographic groups...
+  
+        
+        phichibar=.5
+        phiz=.3
+        phiybar=.3
+        
+        sigepschi=.01
+        sigepsx=.01
+        betax=.5
+        betachi=.5
+       
+
+        repli=30
+        
+       #source("loovslo_worker.R")
+
+
+
+```
+
+
+
+# Parameter setup
+
+```{r eruptions, echo=FALSE}
+#inputPanel
+fluidPage(
+
+    sliderInput("firms",
+                  "Number of firms",
+                  min = 10,
+                  max = 5000,
+                  value = firms),
+    
+    sliderInput("n_g",
+                  "Groups",
+                  min = 2,
+                  max = 1000,
+                  value = n_g),
+    
+
+    sliderInput("repli",
+                  "Replications",
+                  min = 1,
+                  max = 1000,
+                  value = repli)
+
+
+  
+)  
+
+
+#library(rlang)
+source("loovslo_worker.R")
+
+
+
+
+gamble=function(input){
+         # Collect the parameters
+
+
+  
+       firms=input$firms
+       repli=input$repli
+       n_g=input$n_g
+  
+       keys   <- c("firms", 
+                   "n_g",
+                   "repli",
+                   #"sigeps",
+                   "signu",
+                   "sigxi",
+                   "phichibar",
+                   "phiz",
+                   "phiybar",
+                   "sigepschi",
+                   "sigepsx",
+                   "betachi",
+                   "betax")
+       values=c()
+       
+
+       
+       for(kk in keys){
+         expr=paste0("values=c(values,",kk,")")
+         eval(parse(text=expr))
+         #print(expr)
+        }
+       
+       params <- setNames(as.list(values), keys)
+       
+       res=monte(params)
+       return(res)
+  }
+
+##################################
+
+
+#######################
+
+renderText({
+  
+  #print("now")
+  
+  rr_df=gamble(input)
+  
+  ##############################################################
+  
+  
+ # plotValuesPromise <- worker$run_job("plotValuesPromise", function(args) {
+#    gamble(input)
+#  },
+#  args_reactive = reactive({
+#    input$triggerButton
+#    print("triggered!")
+#    ""
+#  }))
+  
+ # rr_df=plotValuesPromise()
+  
+  
+  ##############################################################
+  
+ 
+
+  
+  
+  ##############
+  
+  
+  library(latex2exp)
+  library(gridExtra)
+  library(grid)
+  library(ggplot2)
+  library(lattice)
+  library(ggplot2)
+  
+
+  p_betax_ols=rr_df %>% ggplot(aes(x=betax_ols))+geom_density()+
+              geom_vline(xintercept = betax,         color = "blue", size=1.5)+
+              xlab(TeX("$\\beta_x$"))+
+              #xlab(expression(gamma))+
+              theme_minimal()
+  
+  p_betachi_ols=rr_df %>% ggplot(aes(x=betachi_ols))+geom_density()+
+    geom_vline(xintercept = betachi,       color = "blue", size=1.5)+
+    xlab(TeX("$\\beta_{\\chi}$"))+
+    theme_minimal()
+  
+  output$ols=renderPlot(grid.arrange(p_betax_ols,p_betachi_ols, nrow = 1))
+  
+
+  
+  ########################################################
+      p_betax_LOO=rr_df %>% ggplot(aes(x=betax_LOO))+geom_density()+
+              geom_vline(xintercept = betax,         color = "blue", size=1.5)+
+              xlab(TeX("$\\beta_x$"))+
+              #xlab(expression(gamma))+
+              theme_minimal()
+  
+  p_betachi_LOO=rr_df %>% ggplot(aes(x=betachi_LOO))+geom_density()+
+    geom_vline(xintercept = betachi,       color = "blue", size=1.5)+
+    xlab(TeX("$\\beta_{\\chi}$"))+
+    theme_minimal()
+  
+  output$LOO=renderPlot(grid.arrange(p_betax_LOO,p_betachi_LOO, nrow = 1))
+
+  ##############################################
+  
+  
+    p_betax_LO=rr_df %>% ggplot(aes(x=betax_LO))+geom_density()+
+              geom_vline(xintercept = betax,         color = "blue", size=1.5)+
+              xlab(TeX("$\\beta_x$"))+
+              #xlab(expression(gamma))+
+              theme_minimal()
+  
+  p_betachi_LO=rr_df %>% ggplot(aes(x=betachi_LO))+geom_density()+
+    geom_vline(xintercept = betachi,       color = "blue", size=1.5)+
+    xlab(TeX("$\\beta_{\\chi}$"))+
+    theme_minimal()
+  
+  output$LO=renderPlot(grid.arrange(p_betax_LO,p_betachi_LO, nrow = 1))
+
+  
+  ########################################################
+    p_betax_LOX=rr_df %>% ggplot(aes(x=betax_LOX))+geom_density()+
+              geom_vline(xintercept = betax,         color = "blue", size=1.5)+
+              xlab(TeX("$\\beta_x$"))+
+              #xlab(expression(gamma))+
+              theme_minimal()
+  
+  p_betachi_LOX=rr_df %>% ggplot(aes(x=betachi_LOX))+geom_density()+
+    geom_vline(xintercept = betachi,       color = "blue", size=1.5)+
+    xlab(TeX("$\\beta_{\\chi}$"))+
+    theme_minimal()
+  
+  output$LOX=renderPlot(grid.arrange(p_betax_LOX,p_betachi_LOX, nrow = 1))
+
+  print("................................................................................")# %>% withSpinner()
+  #summary(rr_df)
+  #textOutput("t1")%>% withSpinner(color="#0dc5c1")
+
+})
+
+```
+
+# Monte Carlo Results
+
+Blue lines indicate true parameter values. Output might take a couple of seconds to appear....
+
+### OLS
+
+
+```{r}
+plotOutput("ols")
+
+```
+
+
+### LOO: Leave One Out
+
+```{r}
+plotOutput("LOO")
+
+```
+
+### LO: Leave more than one Out
+
+```{r}
+plotOutput("LO")
+
+```
+
+
+### LOX: Leave more than one Out with eXtra controls
+
+```{r}
+plotOutput("LOX")
+#renderPlot(grid.arrange(p_betax_LOX,p_betachi_LOX, nrow = 1))
+```
+
+
+# References:
+
+- The code for this is available under [https://github.com/mondpanther/loovslo](https://github.com/mondpanther/loovslo)
