@@ -60,7 +60,7 @@ drawdata=function(FIXFLAG=c("K","L")){
                    L1chibar=lag(chibar))
   
   
-  lm(y~x+chi,df) %>% summary()
+  #lm(y~x+chi,df) %>% summary()
   
 
   return(df)
@@ -135,7 +135,7 @@ esti=cmpfun(esti)
 
 # Run montecarlo ####
 monte=function(params){
-  print("Hello in monet") #%>% withS
+  #print("Hello in monet") #%>% withS
   
   #message(paste('ok made it this far with x='))
   # recover parameters
@@ -182,13 +182,92 @@ monte=function(params){
   
   
   
-  summary=rr_df %>% summary() 
   
+  summary=rr_df %>% summary() 
+  #library(tidyr)
+  #test=rr_df%>% pivot_longer(cols = starts_with("beta"),
+  #                 names_to = "coef",  
+  #                 values_to = "beta")
 
   
+  #test2=test %>% filter(grepl("x",coef))
   return(rr_df)
   
   
 }
 
-#monte=cmpfun(monte)
+
+
+
+gamble=function(input){
+  # Collect the parameters
+  
+  
+  firms=200
+  #sigeps=.1
+  signu=.01
+  sigxi=.1
+  
+  n_g=50   # geographic groups...
+  
+  
+  phichibar=.5
+  phiz=.3
+  phiybar=.3
+  
+  sigepschi=.01
+  sigepsx=.01
+  betax=.5
+  betachi=.5
+  
+  
+  repli=30
+  
+  
+  
+  
+  
+  firms    =(input$firms)
+  repli    =(input$repli)
+  n_g      =input$n_g
+  betax    =input$betax
+  betachi  =input$betachi
+  #sigepschi=input$sigepschi
+  signu    =input$signu
+  phichibar=input$phichibar
+  phiybar=input$phiybar
+  
+  sigxi=    input$sigxi
+  sigepsx=input$sigepsx
+  sigepschi=input$sigepschi
+  
+  
+  keys   <- c("firms", 
+              "n_g",
+              "repli",
+              #"sigeps",
+              "signu",
+              "sigxi",
+              "phichibar",
+              "phiz",
+              "phiybar",
+              "sigepschi",
+              "sigepsx",
+              "betachi",
+              "betax")
+  values=c()
+  
+  
+  
+  for(kk in keys){
+    expr=paste0("values=c(values,",kk,")")
+    eval(parse(text=expr))
+    #print(expr)
+  }
+  
+  params <- setNames(as.list(values), keys)
+  
+  res=monte(params)
+  return(res)
+}
+

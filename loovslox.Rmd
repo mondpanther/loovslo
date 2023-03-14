@@ -270,17 +270,15 @@ shinyApp(
               geom_vline(xintercept = input$betax,      color = "blue", size=1.5,alpha=0.8)+
               xlab(TeX("$\\beta_x$"))+
               #xlab(expression(gamma))+
-              theme_minimal()+ylab("Density")+
-                theme(axis.title.x=element_text(size=18))+
-                theme(axis.text.x=element_text(size=14))+
+              theme_minimal()+
+                theme(axis.text.x=element_text(size=18))+
                 scale_color_discrete(name = " ", labels = c("LO", "LOO", "LOX", "OLS")))
 
   p_betachi_LOX=reactive(rr_df() %>% filter(grepl("chi",coef)) %>% ggplot(aes(x=beta,color=coef))+geom_density(size=1,alpha=.5)+
                 geom_vline(xintercept = input$betachi,       color = "blue", size=1.5,alpha=0.8)+
                 xlab(TeX("$\\beta_{\\chi}$"))+
-                theme_minimal()+ylab("Density")+
-                theme(axis.title.x=element_text(size=18))+
-                theme(axis.text.x=element_text(size=14))+
+                theme_minimal()+
+                  theme(axis.text.x=element_text(size=18))+
                   scale_color_discrete(name = " ", labels = c("LO", "LOO", "LOX", "OLS")))
 
   output$LOX=renderPlot(ggarrange(p_betax_LOX(),p_betachi_LOX(), nrow = 1, common.legend = TRUE, legend = "bottom") %>% 
